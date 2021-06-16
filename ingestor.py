@@ -1,13 +1,8 @@
-from pymongo import MongoClient, UpdateOne
+from pymongo import UpdateOne
 import requests
 
-client = MongoClient()
-client = MongoClient('mongodb://localhost:27017/')
-db = client['youtube']
-video_collection = db['videos']
 
-
-def youtube_ingestor(query_term):
+def youtube_ingestor(query_term, video_collection):
     key = "AIzaSyAa8yy0GdcGPHdtD083HiGGx_S0vMPScDM"
     youtube_content_url = f"https://content-youtube.googleapis.com/youtube/v3/search?part=snippet&key=" \
                           f"{key}&q={query_term}"
