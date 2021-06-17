@@ -7,5 +7,8 @@ DEFAULT_PAGE_OFFSET = 0
 DEFAULT_PAGE_SIZE = 30
 
 flask_app_config = {
-    "CACHE_TYPE": "SimpleCache",  # Flask-Caching related configs
+    "CACHE_TYPE": "RedisCache",
+    "CACHE_REDIS_HOST": "redis",
+    "CACHE_KEY_PREFIX": "request-",
+    "CACHE_REDIS_PORT": 6379
 }

@@ -7,6 +7,7 @@ app:
     - .:/app
   links:
     - db
+    - redis
 db:
   image: mongo:latest
   hostname: test_mongodb
@@ -19,3 +20,5 @@ db:
     - ./init-db.js:/docker-entrypoint-initdb.d/init-db.js:ro
   ports:
     - "27018:27017"
+redis:
+  image: redis

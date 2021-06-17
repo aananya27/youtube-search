@@ -1,11 +1,12 @@
 from flask import request
 from pymongo import UpdateOne
-
+from constants import DEFAULT_PAGE_OFFSET, DEFAULT_PAGE_SIZE
 
 def make_cache_key(*args, **kwargs):
-    path = request.path
-    args = str(hash(frozenset(request.args.items())))
-    return (path + args).encode('utf-8')
+    offset = int(request.args.get('offset', default=DEFAULT_PAGE_OFFSET))
+    size = int(request.args.get('size', default=DEFAULT_PAGE_SIZE))
+    q = request.args.get('q', default="")
+    return str(offset) + str(size) + q
 
 
 def get_video_dict(item, operations):
