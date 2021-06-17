@@ -6,8 +6,11 @@ from bson.json_util import dumps
 import json
 from flask_caching import Cache
 
-client = MongoClient('mongodb://localhost:27017/')
-db = client['youtube']
+client = MongoClient(host="test_mongodb", port=27017,
+                     username='root',
+                     password='pass',
+                     authSource="admin")
+db = client['youtubedump']
 video_collection = db['videos']
 init_youtube_ingestor(video_collection, "animal", 5)
 
@@ -46,4 +49,4 @@ def videos():
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host="0.0.0.0", port=5000)

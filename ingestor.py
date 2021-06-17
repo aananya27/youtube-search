@@ -4,6 +4,7 @@ import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 from functools import partial
 
+
 def youtube_ingestor(query_term, video_collection):
     key = "AIzaSyAa8yy0GdcGPHdtD083HiGGx_S0vMPScDM"
     current_date_time = datetime.datetime.utcnow()
