@@ -5,46 +5,56 @@ from pymongo import MongoClient
 from bson.json_util import dumps
 import json
 from flask_caching import Cache
+from constants import flask_app_config
 
+# mongodb client init
 client = MongoClient(host="test_mongodb", port=27017,
                      username='root',
                      password='pass',
                      authSource="admin")
+
+# grab the video collection
 db = client['youtubedump']
 video_collection = db['videos']
+
+# invoke youtube ingestor
 init_youtube_ingestor(video_collection, "animal", 5)
 
-config = {
-    "DEBUG": True,  # some Flask specific configs
-    "CACHE_TYPE": "SimpleCache",  # Flask-Caching related configs
-}
-
+# create flask app with cache
 app = Flask(__name__)
-app.config.from_mapping(config)
+app.config.from_mapping(flask_app_config)
 cache = Cache(app)
 
 
 @app.route('/videos')
 @cache.cached(timeout=100000, key_prefix=make_cache_key)
 def videos():
+    # defined offset, size for pagination. query string for text search over title & description.
     offset = int(request.args.get('offset', default=0))
     size = int(request.args.get('size', default=30))
     q = request.args.get('q', default="")
-    if q == "":
-        db_result = video_collection.find({}).skip(offset).limit(size).sort('publishedat', -1)
-        res = json.loads(dumps(list(db_result)))
-    else:
-        db_result = video_collection.find({"$text": {"$search": q}}).skip(offset).limit(size).sort('publishedat', -1)
-        res = json.loads(dumps(list(db_result)))
+    try:
+        if q == "":
+            db_result = video_collection.find({}).skip(offset).limit(size).sort('published_at', -1)
+        else:
+            db_result = video_collection.find({"$text": {"$search": q}}).skip(offset).limit(size).sort('published_at',
+                                                                                                       -1)
+        if db_result:
+            res = json.loads(dumps(list(db_result)))
+        else:
+            res = []
+    except Exception as e:
+        print("An error occoured while reading from the database", e)
+        return 'Something went wrong', 500
 
     return {
         'data': res,
         'page': {
             'size': size,
             'offset': offset,
-            'next': f"/videos?size={size}&offset={offset + size}"
+            # gives the path for next page, if list is exhausted null is set for frontend to detect
+            'next': None if len(res) < size else f"/videos?size={size}&offset={offset + size}"
         }
-
     }
 
 
