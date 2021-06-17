@@ -1,6 +1,6 @@
 from flask import Flask, request
 from ingestor import init_youtube_ingestor
-from utils import make_cache_key
+from utils import make_cache_key_for_videos
 from pymongo import MongoClient
 from bson.json_util import dumps
 import json
@@ -27,7 +27,7 @@ cache = Cache(app)
 
 
 @app.route('/videos')
-@cache.cached(timeout=CACHE_TIMEOUT_MS, key_prefix=make_cache_key)
+@cache.cached(timeout=CACHE_TIMEOUT_MS, key_prefix=make_cache_key_for_videos)
 def videos():
     # defined offset, size for pagination. query string for text search over title & description.
     offset = int(request.args.get('offset', default=DEFAULT_PAGE_OFFSET))
