@@ -5,7 +5,7 @@ from pymongo import MongoClient
 from bson.json_util import dumps
 import json
 from flask_caching import Cache
-from constants import flask_app_config
+from constants import flask_app_config, CACHE_TIMEOUT_MS, INGESTOR_INTERVAL_SECONDS, DEFAULT_PAGE_SIZE, DEFAULT_PAGE_OFFSET
 
 # mongodb client init
 client = MongoClient(host="test_mongodb", port=27017,
@@ -18,7 +18,7 @@ db = client['youtubedump']
 video_collection = db['videos']
 
 # invoke youtube ingestor
-init_youtube_ingestor(video_collection, "animal", 5)
+init_youtube_ingestor(video_collection, "animal", INGESTOR_INTERVAL_SECONDS)
 
 # create flask app with cache
 app = Flask(__name__)
@@ -27,11 +27,11 @@ cache = Cache(app)
 
 
 @app.route('/videos')
-@cache.cached(timeout=100000, key_prefix=make_cache_key)
+@cache.cached(timeout=CACHE_TIMEOUT_MS, key_prefix=make_cache_key)
 def videos():
     # defined offset, size for pagination. query string for text search over title & description.
-    offset = int(request.args.get('offset', default=0))
-    size = int(request.args.get('size', default=30))
+    offset = int(request.args.get('offset', default=DEFAULT_PAGE_OFFSET))
+    size = int(request.args.get('size', default=DEFAULT_PAGE_SIZE))
     q = request.args.get('q', default="")
     try:
         if q == "":

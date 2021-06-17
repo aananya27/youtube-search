@@ -2,18 +2,18 @@ import requests
 import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 from functools import partial
-from constants import key
+from constants import YOUTUBE_KEY, INGESTOR_REWIND_MINUTES
 from utils import get_video_dict
 
 
 def youtube_ingestor(query_term, video_collection):
     # takes current time and rewinds 5 minutes from it to fetch data from that as publishedAt
     current_date_time = datetime.datetime.utcnow()
-    minutes_delta = datetime.timedelta(minutes=5)
+    minutes_delta = datetime.timedelta(minutes=INGESTOR_REWIND_MINUTES)
     time_at_to_scrape = (current_date_time - minutes_delta).isoformat() + "Z"
 
     youtube_content_url = f"https://content-youtube.googleapis.com/youtube/v3/search?part=snippet&key=" \
-                          f"{key}&q={query_term}&type=video&order=date&publishedAfter{time_at_to_scrape}&maxResults=50"
+                          f"{YOUTUBE_KEY}&q={query_term}&type=video&order=date&publishedAfter{time_at_to_scrape}&maxResults=50"
 
     headers = {
         'authority': 'content-youtube.googleapis.com',
