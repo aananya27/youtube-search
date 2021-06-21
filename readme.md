@@ -6,7 +6,7 @@ docker-compose up
 
 ## Architecture
 
-![Solution Architecture ](./design.svg)
+![Solution Architecture ](./arch.png)
 
 Components
 1. Youtube Ingestor - Hits the YouTube API every few minutes in an async cron job and adds details into the DB. It also makes sure the API is hit with `current time - X` minutes.
